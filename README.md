@@ -26,17 +26,17 @@ with a user and an ending condition based on user input.
 
 ---
 
-### Final Thoughts
+<!-- ### Final Thoughts
 
 For best experience, run in another console or IDE, that is not PyCharm.
 PyCharm has a bug on text-rendering which prints the formatting of my game_board incorrectly. 
 
- <!-- <img src="https://hardcore-golick-0f0d78.netlify.com/pycharm.png"> -->
+ <img src="https://hardcore-golick-0f0d78.netlify.com/pycharm.png"> -->
 
 
 ---
 
-## Modules Used
+<!-- ## Modules Used
 ### Inbuilt Modules 
 - <a href="https://docs.python.org/3/library/random.html" target="_blank">Random </a>
 ### Style Modules 
