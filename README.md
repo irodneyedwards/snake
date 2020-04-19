@@ -20,37 +20,6 @@ with a user and an ending condition based on user input.
 
 ---
 
-### Features to build
-
-Intro Window:
-Levels: Beginner, Hard
-- Level should change the initial speed of the snake's movement
-- Selecting the level should be a mouse click event = Easy button and Hard button
-
-Game Over Window:
-- display game over message
-- give user option to close or restart game
-- Click on difficulty will start the game
-  
-High-Level Overview: 
-1. Display the screen = Done!
-2. User should see a starting screen with easy and hard
-3. Main Game Window
-   1. User sees score
-4. Add snake to screen
-5. Snake starts to move
-   1. Games controls are listed (optionally)
-6. User presses key (right, left, up, down) to control snake direction
-7. Food is spawned
-   1. If snake eats food, score increases
-   2. Snake should also grow when eating food
-8. User moves snake to eat the food without hitting the walls of the game board
-9. User continues to try and eat generated food
-10. Poison is randomly generated and player trys to avoid it
-    1.  If they eat the poison they either die or shrink and score decreases
-11. User dies and game over window pops up with exit control or restart control
-
-
 ---
 
 <!-- ## Final Output
