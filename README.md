@@ -1,4 +1,4 @@
-# Snake
+# Neon Dragon
 
 <!-- PROJECT LOGO -->
 <br />
