@@ -4,7 +4,7 @@
 <br />
 <p align="center">
 
-  <!-- <img src="https://hardcore-golick-0f0d78.netlify.com/connect_4.jpeg" alt="Logo" width="200" height="200"> -->
+  <img src="https://stoic-darwin-c1f5d7.netlify.app/snake_xl.png" alt="Logo" width="200" height="200">
 </p>
 
 > A rendition of the classic game Snake built in Python with PyGame
