@@ -30,9 +30,11 @@ pygame.init()
 pygame.font.init()
 
 # 3. Declare constants
+
 CUBE = 20 # Generic block, to pass in as snake body, food, poison 
 
-# Colors ------------------------------------------------------- #
+# Colors ---------------------------------------------------------- #
+
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
@@ -43,16 +45,7 @@ NEON_PURPLE = (193,131,255)
 NEON_BLUE = (73,222,255)
 NEON_GREEN =(67,255,175)
 
-# Fonts ------------------------------------------------------- #
-FONT_SIZE_SM  = 20
-FONT_SIZE_MD  = 30
-FONT_SIZE_LG  = 60
-FONT_SIZE_XL  = 80
-
-
-
-# Styles ------------------------------------------------------- #
-BUTTON_PLATE = (100, 50)
+# Utilities ------------------------------------------------------- #
 
 # Set the GAME_DISPLAY window sizes
 SCREEN_SIZE_BEGINNER = 600
@@ -65,8 +58,14 @@ pygame.display.set_caption('Snakeyy - a python game.')
 # Pass through screen size variables into the Tuple with an extra set of ()
 GAME_DISPLAY = pygame.display.set_mode((SCREEN_SIZE_BEGINNER, SCREEN_SIZE_BEGINNER))
 
-# Defining messages function to draw text to screen ---------- #
-## Which takes a msg parameter and a color parameter, x, y
+# Bounding Frame Size
+BUTTON_PLATE = (100, 50)
+# Fonts ---------------------------------------------------------- #
+
+FONT_SIZE_SM  = 20
+FONT_SIZE_MD  = 30
+FONT_SIZE_LG  = 60
+FONT_SIZE_XL  = 80
 
 small_font = pygame.font.SysFont(None, FONT_SIZE_SM)
 medium_font = pygame.font.SysFont(None, FONT_SIZE_MD)
@@ -76,17 +75,19 @@ xlarge_font =   pygame.font.SysFont(None, FONT_SIZE_XL)
 text_x = 20
 texy_y = 30
 
+# Image Loads ------------------------------------------------------- #
 
-# snake_head_img = pygame.image.load('/assets/imgs/snake_head.png')
-snake_header_img = pygame.image.load('snake_xl.png')
-food_img = pygame.image.load('donut.png')
+snake_header_img = pygame.image.load('imgs/snake_xl.png')
+food_img = pygame.image.load('imgs/donut.png')
+
+# Defining message function(s) to draw text to screen ------------------------------------------------------- #
 
 def text_object(text, color, size):
-
     # 1. First Render Font
-    ## The first parmeter is msg, which stands for what text string you will pass through
+    ## The first parmeter is text, which stands for what text string you will pass through
     ### The second patameter is set to True, which means Anti-Aliasing
     ### The third parameter is color which equals the text color
+    #### The fourth parameter is for the font size
     if size == "small":
         text_surface = small_font.render(text, True, color)
     elif size == "medium":
@@ -106,36 +107,30 @@ def message_on_screen(msg, color, x_displace=0, y_displace=0, size = "medium" ):
     ## Tuple Text rect is the rectangle around text data
     text_surface, text_rect = text_object (msg, color, size)
 
-    # What is the center of this text rectangle object - it's width and height of the main display divided by two. 
+    # What is the center of this text rectangle object - it's width and height of the main display divided by two.
+    ## I added the ability to displace the x or y cordinate to make this message function more flexible.
     text_rect.center = (int(SCREEN_SIZE_BEGINNER/2) + x_displace, int(SCREEN_SIZE_BEGINNER/2) + y_displace)
     # We blit to text surface, which blits the text rectangle
     GAME_DISPLAY.blit(text_surface, text_rect)
 
-# Defining messages function to draw text to screen ------------------------------------------------------- #
-## Which takes a msg parameter and a color parameter
-# def text_object(text, font, color):
-# def message_on_screen (msg, color, text_x, text_y):
 
-#     screen_size = SCREEN_SIZE_BEGINNER
-
-#     text_surface = font.render(msg, True, color)
-
-#     GAME_DISPLAY.blit(text_surface, (text_x , text_y))
-
-# Flight: Main Game Window -------------------------------------------------------------------------------- #
+# Flight: Main Game Window Functions -------------------------------------------------------------------------------- #
 
 def start_screen():
-
-    click = False
-
     # Scene 1 - Game Starting Menu Screen
-    
+
     # - Player is greeted with a welcome, Title
-    # - Under Title, there is a sub-title that says, "Choose a Mode...
+    # - Under Title, there is a sub-title that says, "Click Start to Begin!"
+    # - Feature Omitted
     # - Player can choose between difficulty level
     # - Easy Mode = Slower starting speed for snake body, and large screen display
-    # - Hard Mode = Faster starting speed for snake body, and smaller screen display
+    # ## Hard Mode = Faster starting speed for snake body, and smaller screen display
 
+
+    # This click variable is my switcher for the mouseclick event later referenced
+    click = False
+    
+    # function game loop
     running = True
     while running:
 
@@ -152,9 +147,6 @@ def start_screen():
         # GAME_DISPLAY.blit(snake_header_img, (600-snake_header_img.get_width()/2, 600-snake_header_img.get_height()/2))
         
 
-        # 3. Draw a Sub-Title under Title. 
-          
-
         # 4. Easy and Hard Buttons
         # 4a. - This Button needs to run the game in easy mode
         ## - This Button needs to run the game in easy mode
@@ -166,8 +158,7 @@ def start_screen():
         # hard = pygame.Rect((400, 250), BUTTON_PLATE)
         # pygame.draw.rect(GAME_DISPLAY, NEON_PURPLE, hard)
 
-        
-    
+
         # 5. There needs to be a click state for the buttons
         mx, my = pygame.mouse.get_pos()
 
@@ -178,6 +169,7 @@ def start_screen():
         #     if click:
         #         game_over()
         
+
         # 6. Event List
         #resets every frame before handling the input
         click = False 
@@ -202,10 +194,6 @@ def start_screen():
         pygame.display.update()
 
 
-# def snake(head_of_snake_top, head_of_snake_left):
-
-#     pygame.draw.rect(GAME_DISPLAY, BLACK, (head_of_snake_top, head_of_snake_left, CUBE, CUBE))
-
 scale = 5
 
 def update(snake, speed_x, speed_y):
@@ -227,7 +215,7 @@ def random_location(screen_size):
     print(x,y)
     return(x, y)
 
-    # returns if snake collides with something that should end the game
+# returns if snake collides with something that should end the game
 def end_game_collision(snake, screen_size):
     head = snake[-1]
     x, y = head.x, head.y
@@ -240,6 +228,7 @@ def end_game_collision(snake, screen_size):
         if part.x == x and part.y == y:
             return True
 
+# loads a random location for x, y equal to the screen_size
 def random_location(screen_size):
     x = random.randrange(10, screen_size-CUBE, CUBE)
     y = random.randrange(10, screen_size-CUBE, CUBE)
@@ -247,18 +236,16 @@ def random_location(screen_size):
     return(x, y)
 
 def score(score):
-    message_on_screen("Score:" +str(score), NEON_BLUE, x_displace = -200, y_displace = -280, size="small")
-    # text = small_font.render("Score" +str(score), True, WHITE)
-    # GAME_DISPLAY.blit(text, (0, 0))
-
-def game():
-
-    # Game Environment ------------------------------------------------- #
-
     # Top Score ------------------------------------------------------- #
     # Scene 2 - Main Game Window
     # A. There is a score at the top of the screen
     # -- Draw text to the top right of the game window
+    message_on_screen("Score:" +str(score), WHITE, x_displace = -200, y_displace = -280, size="small")
+    # text = small_font.render("Score" +str(score), True, WHITE)
+    # GAME_DISPLAY.blit(text, (0, 0))
+
+    # Game Environment ------------------------------------------------- #
+def game():
 
     # Function Variables ---------------------------------------------- #
     FPS = 60 # Frames Per Second
@@ -283,10 +270,8 @@ def game():
 
     # Food  ---------------------------------------------------------- #
 
-    # To Do: 
     # Food is generated on the screen
     # -- 1. Define variable named food
-    food = pygame.Rect(random_location(screen_size), (30, 30))
     # -- 2. Draw the object to the screen to represent food
     # -- 3. Food object appears on game board in random x / y position
     # -- 4. When the snake object collides with food object
@@ -294,13 +279,13 @@ def game():
     # --- 4b. Snake object grows by one
     # ----4b.1. Append to back of the snake object
     # -- 5. Arbitrary Score is added to the Score at the top of the screen
+    
+    food = pygame.Rect(random_location(screen_size), (30, 30))
 
     # Poison ------------------------------------------------------- #
 
-    # To Do:
     # Poison is randomly generated on the screen at a time interval
     # -- 1. Define variable named poison
-    poison = pygame.Rect(random_location(screen_size), (CUBE, CUBE))
     # -- 2. Poison object to screen to represent poison
     # -- 3. Poison object appears on game board in random x / y position
     # -- 4. When the snake object collides with poison object
@@ -308,9 +293,10 @@ def game():
     # ----4b. Delete from the back of the snake object
     # -- 5. Arbitrary Score is reduced to the Score at the top of the screen
 
+    poison = pygame.Rect(random_location(screen_size), (CUBE, CUBE))
 
+    
     # distance_traveled = 10 #distance traveled when location is updated
-
 
     running = True # Default Loop Running State
     while running:
@@ -382,11 +368,6 @@ def game():
         score(snake[-1])
 
         pygame.display.update()
-
-        # if head_of_snake_top == food.x and head_of_snake_left == food.y:
-        #     food = pygame.Rect(random_location(screen_size), (CUBE, CUBE))
-
-
         clock.tick(FPS)
     pygame.quit()
 
@@ -409,10 +390,9 @@ def game_over():
 
         # 2. Draw a Title, in the center of the window
         message_on_screen("Game Over!", NEON_GREEN, x_displace=0, y_displace=-50, size="large")
+        # 3. Draw a Sub-Title = to score() under Title. 
 
-        # 3. Draw a Sub-Title under Title. 
           
-
         # 4. Start Over
         # 4a. - This Button needs to return player to the start screen
         start_again = pygame.Rect((250, 400), BUTTON_PLATE)
@@ -456,3 +436,5 @@ game()
 # event handling
 # logic
 # graphics rendering
+        # if head_of_snake_top == food.x and head_of_snake_left == food.y:
+        #     food = pygame.Rect(random_location(screen_size), (CUBE, CUBE))
