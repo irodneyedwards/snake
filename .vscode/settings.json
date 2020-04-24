@@ -1,7 +1,10 @@
 {
     "python.pythonPath": "/Users/irodneyedwards/Documents/GitHub/snake/env/bin/python",
     "cSpell.words": [
+        "HSCI",
         "blit",
-        "pygame"
+        "imgs",
+        "pygame",
+        "xlarge"
     ]
 }

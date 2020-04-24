@@ -120,7 +120,7 @@ def message_on_screen(msg, color, x_displace=0, y_displace=0, size="medium"):
     text_rect.center = (int(SCREEN_SIZE_BEGINNER/2) +
                         x_displace, int(SCREEN_SIZE_BEGINNER/2) + y_displace)
 
-    # We blit to text surface, which blits the text rectangle
+    # We blit to text surface, which will blit the text rectangle
     GAME_DISPLAY.blit(text_surface, text_rect)
 
 
@@ -401,8 +401,7 @@ def game():
         # Snake needs to be drawn to screen
         # snake(initial_x, initial_y)
         # I couldn't figure out how to replace the rect object with an image
-        # I figured it out for the food and poison objects, but the snake kep't
-        # breaking.
+        # I figured it out for the food and poison objects, but for the snake it would break
         for body in snake:
             pygame.draw.rect(GAME_DISPLAY, NEON_GREEN, body)
 
