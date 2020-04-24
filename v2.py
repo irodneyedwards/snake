@@ -22,7 +22,7 @@
 # 1. Imports
 import pygame, sys
 from pygame import font
-mainClock = pygame.time.Clock()
+clock = pygame.time.Clock()
 import random
 
 # 2. Initialize Pygame
@@ -97,7 +97,7 @@ BUTTON_PLATE = (100, 50)
 
 # Flight: Main Game Window -------------------------------------------------------------------------------- #
 
-def start():
+def start_screen():
 
     click = False
 
@@ -340,6 +340,7 @@ def game():
         ## pygame.display.flip()
         ### updates the area around what's suppose to update
         pygame.display.update()
+        # clock.tick(1000)
 
     game_over()
 
@@ -404,7 +405,7 @@ def game_over():
         ### updates the area around what's suppose to update
         pygame.display.update()
 
-start()
+start_screen()
 game()
 
 

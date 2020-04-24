@@ -1,3 +1,7 @@
 {
-    "python.pythonPath": "/Users/irodneyedwards/Documents/GitHub/snake/env/bin/python"
+    "python.pythonPath": "/Users/irodneyedwards/Documents/GitHub/snake/env/bin/python",
+    "cSpell.words": [
+        "blit",
+        "pygame"
+    ]
 }

@@ -1,4 +1,4 @@
-# # ------------------------------------------------------------------------------------------------------- #
+# ------------------------------------------------------------------------------------------------------- #
 # Computer Science for Designers and Artists
 # HSCI-234-01
 # Week 14
@@ -12,8 +12,8 @@
 # with a user and an ending condition based on user input.
 # --------------------------------------------------------------------------------------------------------- #
 # -------------------------------------- Snake Game ------------------------------------------------------- #
-# The purpose of the game is to collect the highest-score by eating food, 
-# while avoid colliding with yourself and the gameboard.
+# The purpose of the game is to collect the highest score by eating food, 
+# while avoiding poison objects as well as colliding with yourself and the gameboard.
 # --------------------------------------------------------------------------------------------------------- #
 
 # -------------------------------------- Pre-Flight ------------------------------------------------------- #
@@ -21,96 +21,125 @@
 
 # 1. Imports
 import pygame, sys
-from pygame import font
-clock = pygame.time.Clock()
 import random
+import time
+clock = pygame.time.Clock()
 
 # 2. Initialize Pygame
 pygame.init()
+pygame.font.init()
+
+# 3. Declare constants
+## I wanted to make utility variables, to abstract any hard code values at the function call level.
+
+# Utilities ------------------------------------------------------- #
+CUBE = 20 # Generic block, to pass in as snake, food, poison 
 
 # Set the GAME_DISPLAY window sizes
 SCREEN_SIZE_BEGINNER = 600
-SCREEN_SIZE_ADVANCED = 400
-
-# 3. Write boilerplate Pygame Syntax to Draw basic window
-# Pass through screen size variables into the Tuple with an extra set of ()
-GAME_DISPLAY = pygame.display.set_mode((SCREEN_SIZE_BEGINNER, SCREEN_SIZE_BEGINNER))
-
-# Styles  ------------------------------------------------------- #
+#Descoped feature
+## I wanted to have an advanced mode that would load the initial snake speed faster with the GAME_DISPLAY being smaller. 
+### if I had more time...
+# SCREEN_SIZE_ADVANCED = 400
 
 # 4. Game Window Title
 pygame.display.set_caption('Snakeyy - a python game.')
 
-# 3. Declare constants
+# 5. Write boilerplate Pygame Syntax to Draw basic window
+# Pass through screen size variables into the Tuple with an extra set of ()
+GAME_DISPLAY = pygame.display.set_mode((SCREEN_SIZE_BEGINNER, SCREEN_SIZE_BEGINNER))
 
-# GAME COLORS
+# Bounding Frame Size
+BUTTON_PLATE = (100, 50)
+
+# Colors ---------------------------------------------------------- #
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
+NEON_PURPLE = (193,131,255)
+NEON_BLUE = (73,222,255)
+NEON_GREEN =(67,255,175)
 
-# Fonts ------------------------------------------------------- #
-FONT_SIZE_XXS = 20
-FONT_SIZE_XS  = 30
-FONT_SIZE_SM  = 40
-FONT_SIZE_MD  = 60
-FONT_SIZE_LG  = 80
-FONT_SIZE_XL  = 120
+# Fonts ---------------------------------------------------------- #
+FONT_SIZE_SM  = 20
+FONT_SIZE_MD  = 30
+FONT_SIZE_LG  = 60
+FONT_SIZE_XL  = 80
 
-# Making a font variable, to reference for game text 
-## Second parameter, equals font size
+small_font = pygame.font.SysFont(None, FONT_SIZE_SM)
+medium_font = pygame.font.SysFont(None, FONT_SIZE_MD)
+large_font =   pygame.font.SysFont(None, FONT_SIZE_LG) 
+xlarge_font =   pygame.font.SysFont(None, FONT_SIZE_XL)          
+
+text_x = 20
+texy_y = 30
+
+# Image Loads ------------------------------------------------------- #
+snake_header_img = pygame.image.load('imgs/snake_xl.png')
+food_img = pygame.image.load('imgs/donut.png')
+
+# ---------------------------------- Pre-Flight: Functions -------------------------------------------------- #
+
+# Defining message function(s) to draw text to screen ------------------------------------------------------- #
+def text_object(text, color, size):
+    # 1. First Render Font
+    ## The first parmeter is text, which stands for what text string you will pass through
+    ### The second patameter is set to True, which means Anti-Aliasing
+    ### The third parameter is color which equals the text color
+    #### The fourth parameter is for the font size
+    if size == "small":
+        text_surface = small_font.render(text, True, color)
+    elif size == "medium":
+        text_surface = medium_font.render(text, True, color)
+    elif size == "large":
+        text_surface = large_font.render(text, True, color)
+    elif size == "xlarge":
+        text_surface = xlarge_font.render(text, True, color)
+
+    # returns the text_surface and gets the empty text rectangle
+    return text_surface, text_surface.get_rect()
+
+def message_on_screen(msg, color, x_displace=0, y_displace=0, size = "medium" ):
+    # 2. Putting the text onto GAME_DISPLAY, i.e., "to blit"
+    # Display the text_object
+    # Text Object is a rectangle, with an invisible plate, and then you can center plate around text
+    ## Text Surface is like a pygame.surface object - where we put the text
+    ## Tuple Text rect is the rectangle around text data
+
+    text_surface, text_rect = text_object (msg, color, size)
+
+    # What is the center of this text rectangle object? 
+    ## - it's width and height of the main display divided by two.
+    ### I added the ability to displace the x or y coordinate to make this message function more flexible,
+    #### as I knew I would need to draw text in a few locations
+    text_rect.center = (int(SCREEN_SIZE_BEGINNER/2) + x_displace, int(SCREEN_SIZE_BEGINNER/2) + y_displace)
+
+    # We blit to text surface, which blits the text rectangle
+    GAME_DISPLAY.blit(text_surface, text_rect)
 
 
-
-# Styles ------------------------------------------------------- #
-BUTTON_PLATE = (100, 50)
-
-# Defining messages function to draw text to screen ------------------------------------------------------- #
-## Which takes a msg parameter and a color parameter
-# def text_object(text, font, color):
-
-#     # 1. First Render Font
-#     ## The first parmeter is msg, which stands for what text string you will pass through
-#     ### The second patameter is set to True, which means Anti-Aliasing
-#     ### The third parameter is color which equals the text color
-#     font = pygame.font.SysFont("Arial", FONT_SIZE_XS)
-#     text_surface = font.render(text, True, color)
-
-#     return text_surface, text_surface.get_rect()
-#     # # 2. Putting the font onto GAME_DISPLAY, i.e., "to blit"
-#     # # First parameter (the message to pass through)
-#     # ## Second parameter (X, Y) = where to be placed on screen
-#     # ### Make this dynamic later 
-#     # GAME_DISPLAY.blit(screen_text, (TEXT_X, TEXT_Y))
-
-# def message_display(text, color, font_size):
-
-#     font = pygame.font.SysFont("Arial", 20)
-#     text_surface, text_rect = text_object (text, font, color)
-#     text_rect.center = (int(SCREEN_SIZE_BEGINNER/2), int(SCREEN_SIZE_BEGINNER/4))
-#     GAME_DISPLAY.blit(text_surface, text_rect)
-
-#     pygame.display.update()
-
-
-# Flight: Main Game Window -------------------------------------------------------------------------------- #
+# Flight: Main Game Window Function(s) ---------------------------------------------------------------------- #
 
 def start_screen():
-
-    click = False
-
-    # button_plate = (100, 50)
-
     # Scene 1 - Game Starting Menu Screen
-    
-    # - Player is greeted with a welcome, Title
-    # - Under Title, there is a sub-title that says, "Choose a Mode...
-    # - Player can choose between difficulty level
-    # - Easy Mode = Slower starting speed for snake body, and large screen display
-    # - Hard Mode = Faster starting speed for snake body, and smaller screen display
 
+    # - Player is greeted with a welcome, Title
+    # - Under Title, there is a sub-title that says, "Click Start to Begin!"
+    # - Player can choose between difficulty level
+    # - Easy Mode = Slower starting speed for snake body and large screen display
+    # - Feature Omitted
+    # ## Hard Mode = Faster starting speed for snake body and smaller screen display
+
+    # This click variable is my switcher for the mouseclick event later referenced
+    click = False
+    
+    # Function Game Loop
+    ## to solve for needing screens in my game, i.e., the ability to present a user with a 
+    ## starting screen and a game_over screen, I solved by running an independent game loop
+    ## per function
     running = True
     while running:
 
@@ -119,33 +148,38 @@ def start_screen():
         GAME_DISPLAY.fill(BLACK)
 
         # 2. Draw a Title, in the center of the window
-        # message_display("Welcome", GREEN, FONT_SIZE_LG)
-
         # 3. Draw a Sub-Title under Title. 
-          
+        message_on_screen("Neon Dragon", NEON_GREEN, x_displace = 0, y_displace= -50, size= "xlarge")
+        message_on_screen("Click Start to Begin!", WHITE, x_displace = 0, y_displace= 0, size="medium")
+
+    
+        GAME_DISPLAY.blit(snake_header_img, (200, 0))
+        # GAME_DISPLAY.blit(snake_header_img, (600-snake_header_img.get_width()/2, 600-snake_header_img.get_height()/2))
+        
 
         # 4. Easy and Hard Buttons
         # 4a. - This Button needs to run the game in easy mode
         ## - This Button needs to run the game in easy mode
-        easy = pygame.Rect((200, 250), BUTTON_PLATE)
-        pygame.draw.rect(GAME_DISPLAY, GREEN, easy)
+        easy = pygame.Rect((250, 400), BUTTON_PLATE)
+        pygame.draw.rect(GAME_DISPLAY, NEON_PURPLE, easy)
 
-        # 4b. Draw a button that has text inside that reads, "Hard."
-        ## - This Button needs to run the game in hard mode
-        hard = pygame.Rect((400, 250), BUTTON_PLATE)
-        pygame.draw.rect(GAME_DISPLAY, RED, hard)
-        
-    
+        # # 4b. Draw a button that has text inside that reads, "Hard."
+        # ## - This Button needs to run the game in hard mode
+        # hard = pygame.Rect((400, 250), BUTTON_PLATE)
+        # pygame.draw.rect(GAME_DISPLAY, NEON_PURPLE, hard)
+
+
         # 5. There needs to be a click state for the buttons
         mx, my = pygame.mouse.get_pos()
 
         if easy.collidepoint((mx, my)):
             if click:
                 game()
-        if hard.collidepoint((mx, my)):
-            if click:
-                game_over()
+        # if hard.collidepoint((mx, my)):
+        #     if click:
+        #         game_over()
         
+
         # 6. Event List
         #resets every frame before handling the input
         click = False 
@@ -159,6 +193,7 @@ def start_screen():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                    sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True   
@@ -168,25 +203,26 @@ def start_screen():
         ### updates the area around what's suppose to update
         pygame.display.update()
 
+
 scale = 5
 
-def update(snake, x_speed, y_speed):
+def update(snake, speed_x, speed_y):
     head = snake[-1].copy()
     snake.pop(0)
-    head.x += x_speed * scale
-    head.y += y_speed * scale
+    head.x += speed_x * scale
+    head.y += speed_y * scale
     snake.append(head)
     
-def grow(snake, x_speed, y_speed):
+def grow(snake, speed_x, speed_y):
     head = snake[-1].copy()
-    head.x += x_speed * scale
-    head.y += y_speed * scale
+    head.x += speed_x * scale
+    head.y += speed_y * scale
     snake.append(head)
 
 def random_location(screen_size):
-    x = random.randint(10, screen_size - 10)
-    y = random.randint(10, screen_size - 10)
-
+    x = random.randrange(10, screen_size-CUBE, CUBE)
+    y = random.randrange(10, screen_size-CUBE, CUBE)
+    print(x,y)
     return(x, y)
 
 # returns if snake collides with something that should end the game
@@ -194,7 +230,7 @@ def end_game_collision(snake, screen_size):
     head = snake[-1]
     x, y = head.x, head.y
     # collides with wall
-    if x > screen_size or x < 0 or y > screen_size or y < 0:
+    if x > screen_size - 10  or x < 0 or y > screen_size - 10 or y < 0:
         return True
     # collides with self not including head
     for i in range(len(snake) - 1):
@@ -202,38 +238,50 @@ def end_game_collision(snake, screen_size):
         if part.x == x and part.y == y:
             return True
 
-def game():
+# loads a random location for x, y equal to the screen_size
+def random_location(screen_size):
+    x = random.randrange(10, screen_size-CUBE, CUBE)
+    y = random.randrange(10, screen_size-CUBE, CUBE)
+    print(x,y)
+    return(x, y)
 
-    # Game Evironment ------------------------------------------------- #
-
-    # Generic block, to pass in as snake, food, poison 
-    CUBE = (20, 20)
-
+def score(score):
     # Top Score ------------------------------------------------------- #
     # Scene 2 - Main Game Window
     # A. There is a score at the top of the screen
     # -- Draw text to the top right of the game window
+    message_on_screen("Score:" +str(score), WHITE, x_displace = -200, y_displace = -280, size="small")
+    # text = small_font.render("Score" +str(score), True, WHITE)
+    # GAME_DISPLAY.blit(text, (0, 0))
+
+    # Game Environment ------------------------------------------------- #
+def game():
+
+    # Function Variables ---------------------------------------------- #
+    FPS = 60 # Frames Per Second
+    screen_size = SCREEN_SIZE_BEGINNER
 
     # Snake ---------------------------------------------------------- #
     # There needs to be an object which will represent our snake
-    # 1. Define variable named snake
+    # 1. Define variable named snake, and generate poisition on screen 
+
+    # I CAN'T FIGURE OUT HOW TO GET THE SNAKE TO BE ON THE SAME X OR Y DURING COLLISON
+    # head_of_snake_top = random.randrange(10, screen_size-CUBE, CUBE)
+    # head_of_snake_left = random.randrange(10, screen_size-CUBE, CUBE)
 
     head_of_snake_top = 20
     head_of_snake_left = 30
-    snake = [pygame.Rect((head_of_snake_top, head_of_snake_left), CUBE)]
+
+    snake = [pygame.Rect((head_of_snake_top, head_of_snake_left), (CUBE, CUBE))]
 
     # Intial speed of snake
-    speed_x = 0
-    speed_y = 0
+    speed_x = 0 # Container for storing updated location change: x-axis
+    speed_y = 0 # Container for storing updated location change: y-axis
 
-    screen_size = SCREEN_SIZE_BEGINNER
+    # Food  ---------------------------------------------------------- #
 
-   # Food  ---------------------------------------------------------- #
-
-    # To Do: 
     # Food is generated on the screen
     # -- 1. Define variable named food
-    food = pygame.Rect(random_location(screen_size), CUBE)
     # -- 2. Draw the object to the screen to represent food
     # -- 3. Food object appears on game board in random x / y position
     # -- 4. When the snake object collides with food object
@@ -241,15 +289,13 @@ def game():
     # --- 4b. Snake object grows by one
     # ----4b.1. Append to back of the snake object
     # -- 5. Arbitrary Score is added to the Score at the top of the screen
-
     
+    food = pygame.Rect(random_location(screen_size), (30, 30))
 
     # Poison ------------------------------------------------------- #
 
-    # To Do:
     # Poison is randomly generated on the screen at a time interval
     # -- 1. Define variable named poison
-    poison = pygame.Rect(random_location(screen_size), CUBE)
     # -- 2. Poison object to screen to represent poison
     # -- 3. Poison object appears on game board in random x / y position
     # -- 4. When the snake object collides with poison object
@@ -257,99 +303,86 @@ def game():
     # ----4b. Delete from the back of the snake object
     # -- 5. Arbitrary Score is reduced to the Score at the top of the screen
 
+    poison = pygame.Rect(random_location(screen_size), (CUBE, CUBE))
 
-    # Main Game Loop ------------------------------------------------------- #
     
-    # Snake object begins to move on the screen, player interacts with snake by pressing left, right, up, down keys
-   # To Do:
-    # -- 1. Snake starts moving in x-axis on the start of the game
-    # -- 2. There needs to be an event to recognize user input, so the snake object can be controlled, and the direction can change to the orientation of the keyboard event-triggered
-    # -- 4. Snake may not collide with itself
-    
-    # Write loop, to listen for events
-    running = True
+    # distance_traveled = 10 #distance traveled when location is updated
+
+    running = True # Default Loop Running State
     while running:
-
         event_list = pygame.event.get()
-
         for event in event_list:
             if event.type == pygame.QUIT:
-                running = False
+                game_exit = False
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
-                if event.key == pygame.K_LEFT:
+                    sys.exit()
+                elif event.key == pygame.K_LEFT:
                     speed_x = -1
                     speed_y = 0
-                if event.key == pygame.K_RIGHT:
+                elif event.key == pygame.K_RIGHT:
                     speed_x = 1
                     speed_y = 0
-                if event.key == pygame.K_UP:
+                elif event.key == pygame.K_UP:
                     speed_x = 0
                     speed_y = -1
-                if event.key == pygame.K_DOWN:
+                elif event.key == pygame.K_DOWN:
                     speed_x = 0
                     speed_y = 1
-                    
-        # snake[0].x += speed_x
-        # snake[0].y += speed_y
+       
+        # head_of_snake_top += speed_x
+        # head_of_snake_left += speed_y
         update(snake, speed_x, speed_y)
-
 
         # -- 3. Snake may not exit through the walls of the game display
         # --- 3/4a. The game will be over if the snake object hits the walls or itself
-        # if snake[0].right > screen_size or snake[0].left < 0:
-        #     running = False
-
-        # if snake[0].bottom > screen_size or snake[0].top < 0:
-        #     running = False
-
+                # if snake[0].right > screen_size or snake[0].left < 0:
+                #     running = False
+                # if snake[0].bottom > screen_size or snake[0].top < 0:
+                #     running = False
         running = not end_game_collision(snake, screen_size)
+        if end_game_collision(snake, screen_size):
+            game_over()
+       
 
         # Draw to surface (with fill color) or background color
         GAME_DISPLAY.fill(BLACK)
+        # Message_on_screen
+        # message_on_screen("Top Score:", BLACK, x_displace=-200, y_displace=-400)
 
-        # Tuple = (Where you want to draw, what color you want to fill, (X,Y,WIDTH, HEIGHT)
+        # # Snake needs to be drawn to screen
+        # snake(head_of_snake_top, head_of_snake_left)
         for body in snake:
-            pygame.draw.rect(GAME_DISPLAY, BLUE, body)
-        
+            pygame.draw.rect(GAME_DISPLAY, NEON_GREEN, body)
+
         # Generate food on window
         # # Food needs a location on window
-        pygame.draw.rect(GAME_DISPLAY, RED, food)
+        # pygame.draw.rect(GAME_DISPLAY, GREEN, food)
+        GAME_DISPLAY.blit(food_img, food)
 
-        pygame.draw.rect(GAME_DISPLAY, GREEN, poison)
-
-                    
+        # Generate poison on window
+        # # at random
+        pygame.draw.rect(GAME_DISPLAY, NEON_BLUE, poison)
 
         # When snake collides 
         if snake[-1].colliderect(food):
             # snake.append(snake[-1].copy())
             grow(snake, speed_x, speed_y)
             food.x, food.y = random_location(screen_size)
-            print(snake)
-
         if snake[-1].colliderect(poison):
-            # snake.append(snake[-1].copy())
-           running = False
+            game_over()
+    
+        #Call Score
 
-
-        # message_display("This your score:", WHITE, FONT_SIZE_MD)
-
-        # updates the entire the surface
-        ## pygame.display.flip()
-        ### updates the area around what's suppose to update
         pygame.display.update()
-        # clock.tick(1000)
-
-    game_over()
+        clock.tick(FPS)
+    pygame.quit()
 
 def game_over():
 
     click = False
-
-    # button_plate = (100, 50)
-
     # Scene 3 - Game Over Screen
     
     # - Player dies
@@ -365,15 +398,14 @@ def game_over():
         GAME_DISPLAY.fill(BLACK)
 
         # 2. Draw a Title, in the center of the window
-        # message_display("Game Over", WHITE, FONT_SIZE_MD)
+        message_on_screen("Game Over!", NEON_GREEN, x_displace=0, y_displace=-50, size="large")
+        # 3. Draw a Sub-Title = to score() under Title. 
 
-        # 3. Draw a Sub-Title under Title. 
           
-
         # 4. Start Over
         # 4a. - This Button needs to return player to the start screen
-        start_again = pygame.Rect((200, 250), BUTTON_PLATE)
-        pygame.draw.rect(GAME_DISPLAY, WHITE, start_again)
+        start_again = pygame.Rect((250, 400), BUTTON_PLATE)
+        pygame.draw.rect(GAME_DISPLAY, NEON_PURPLE, start_again)
         
     
         # 5. There needs to be a click state for the buttons
@@ -381,7 +413,7 @@ def game_over():
 
         if start_again.collidepoint((mx, my)):
             if click:
-                start()
+                start_screen()
         
         # 6. Event List
         #resets every frame before handling the input
@@ -396,6 +428,7 @@ def game_over():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     running = False
+                    sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     click = True   
@@ -409,7 +442,8 @@ start_screen()
 game()
 
 
-#Archive Notes
-
-# Another option to draw rectangle
-        # GAME_DISPLAY.fill(RED, rect=(10, 20, 50, 50))
+# event handling
+# logic
+# graphics rendering
+        # if head_of_snake_top == food.x and head_of_snake_left == food.y:
+        #     food = pygame.Rect(random_location(screen_size), (CUBE, CUBE))
