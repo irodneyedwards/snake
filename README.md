@@ -52,6 +52,7 @@ For best experience, run in another console or IDE, that is not PyCharm. PyCharm
 - <a href="https://docs.python.org/3/library/random.html" target="_blank">Random </a>
 ### Game Module 
 - <a href="https://www.pygame.org/docs/" target="_blank">PyGame</a>
+- I am running a Dev build of pygame 2.0.0.dev6 (SDL 2.0.10, python 3.8.2) because of Python 3.8 is not supported in PyGame 1.9
 
 ---
 
